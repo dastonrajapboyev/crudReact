@@ -64,7 +64,13 @@ export default class App extends Component {
     // update
     const onUpdate = ({ id, name, status }, isSave) => {
       if (isSave) {
+        let updatedValue = this.state.dataList.map((value) =>
+          value.id === this.state.select?.id
+            ? { ...value, name: this.state.name, status: this.state.status }
+            : value
+        );
         this.setState({
+          dataList: updatedValue,
           select: null,
         });
       } else {
@@ -118,14 +124,24 @@ export default class App extends Component {
                     <td>{id}</td>
                     <td>
                       {this.state.select?.id === id ? (
-                        <input onChange={onChange} name="name" type="text" value={this.state?.name} />
+                        <input
+                          onChange={onChange}
+                          name="name"
+                          type="text"
+                          value={this.state?.name}
+                        />
                       ) : (
                         name
                       )}
                     </td>
                     <td>
                       {this.state.select?.id === id ? (
-                        <input onChange={onChange} name="status" type="text" value={this.state?.status} />
+                        <input
+                          onChange={onChange}
+                          name="status"
+                          type="text"
+                          value={this.state?.status}
+                        />
                       ) : (
                         status
                       )}
@@ -157,92 +173,3 @@ export default class App extends Component {
     );
   }
 }
-
-// export default App;
-
-// ===============================
-
-// import React, { Component } from "react";
-// import { users } from "./mock";
-
-// export default class App extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       name: "",
-//       status: "",
-//       dataList: users,
-//       delete: "delete",
-//       newName: "",
-//     };
-//     // this.handleDeleteUser = this.handleDeleteUser.bind(this);
-//     // this.handleInputChange = this.handleInputChange.bind(this);
-//     // this.handleAddUser = this.handleAddUser.bind(this);
-//   }
-
-//   handleDeleteUser(userId) {
-//     const updatedUsers = this.state.dataList.filter(
-//       (user) => user.id !== userId
-//     );
-//     this.setState({ dataList: updatedUsers });
-//   }
-
-//   handleInputChange(event) {
-//     this.setState({ newName: event.target.value });
-//   }
-
-//   handleAddUser() {
-//     const newUser = {
-//       id: Math.floor(Math.random() * 1000),
-//       name: this.state.newName,
-//       status: "active",
-//     };
-//     this.setState((prevState) => ({
-//       dataList: [...prevState.dataList, newUser],
-//       newName: "",
-//     }));
-//   }
-
-//   render() {
-//     return (
-//       <div>
-//         <input type="text" placeholder="search..." />
-//         <input
-//           type="text"
-//           placeholder="addName"
-//           value={this.state.newName}
-//           onChange={this.handleInputChange}
-//         />
-//         <button onClick={this.handleAddUser}>add name</button>
-//         <table border="1">
-//           <thead>
-//             <tr>
-//               <th>id</th>
-//               <th>name</th>
-//               <th>status</th>
-//               <th>actions</th>
-//             </tr>
-//           </thead>
-
-//           <tbody>
-//             {this.state.dataList.map((value) => {
-//               return (
-//                 <tr>
-//                   <td>{value.id}</td>
-//                   <td>{value.name}</td>
-//                   <td>{value.status}</td>
-//                   <td>
-//                     <button onClick={() => this.handleDeleteUser(value.id)}>
-//                       {this.state.delete}
-//                     </button>
-//                     <button>edit</button>
-//                   </td>
-//                 </tr>
-//               );
-//             })}
-//           </tbody>
-//         </table>
-//       </div>
-//     );
-//   }
-// }
