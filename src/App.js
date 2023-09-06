@@ -1,175 +1,159 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { users } from "./mock";
 
-export default class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      name: "",
-      status: "",
-      dataList: users,
-      select: null,
-      search: "",
-      delete: "delete",
-    };
-  }
-  render() {
-    // delete
-    const onDelete = (userId) => {
-      const updatedUsers = this.state.dataList.filter(
-        (user) => user.id !== userId
-      );
-      this.setState({ dataList: updatedUsers });
-    };
+function App() {
+  const [data, setData] = useState(users);
 
-    // delete
-    const onChange = (e) => {
-      this.setState({ [e.target.name]: e.target.value });
-    };
+  const [search, setSearch] = useState("");
 
-    const onCreate = () => {
-      let user = {
-        id: Date.now(),
-        name: this.state.name,
-        status: this.state.status,
-      };
+  const [name, setName] = useState("");
 
-      this.setState({
-        dataList: [...this.state.dataList, user],
-        name: "",
-        status: "",
-      });
-    };
+  const [status, setStatus] = useState("");
 
-    // search
-    const onSearch = (e) => {
-      let filtered = users.filter((value) =>
-        `${value[this.state.search]}`
-          .toLowerCase()
-          .includes(e.target.value.toLowerCase())
-      );
-      this.setState({
-        dataList: filtered,
-      });
-    };
+  const [select, setSelect] = useState(null);
 
-    // search by category
+  const [values, setValues] = useState({
+    name: "",
+    status: "",
+  });
 
-    const onSelect = (e) => {
-      this.setState({
-        search: e.target.value,
-      });
-    };
+  const onChange = (e) => {
+    setValues({
+      ...values,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-    // update
-    const onUpdate = ({ id, name, status }, isSave) => {
-      if (isSave) {
-        let updatedValue = this.state.dataList.map((value) =>
-          value.id === this.state.select?.id
-            ? { ...value, name: this.state.name, status: this.state.status }
-            : value
-        );
-        this.setState({
-          dataList: updatedValue,
-          select: null,
-        });
-      } else {
-        this.setState({
-          name: name,
-          status: status,
-          select: { id, name, status },
-        });
-      }
-    };
+  // delete
 
-    return (
-      <div>
-        <select onChange={onSelect}>
-          <option value="id">id</option>
-          <option value="name">name</option>
-          <option value="status">status</option>
-        </select>
-        <input onChange={onSearch} type="text" placeholder="search..." />
-        <br />
-        <input
-          value={this.state.name}
-          name="name"
-          // onChange={onChange}
-          type="text"
-          placeholder="addName"
-        />
-        <input
-          value={this.state.status}
-          name="status"
-          // onChange={onChange}
-          type="text"
-          placeholder="enter status"
-        />
-        <button onClick={onCreate}>add user</button>
-        <table border="1">
-          <thead>
-            <tr>
-              <th>id</th>
-              <th>name</th>
-              <th>status</th>
-              <th>actions</th>
-            </tr>
-          </thead>
+  const onDelete = (userId) => {
+    const updatedUsers = data.filter((user) => user.id !== userId);
+    setData(updatedUsers);
+  };
+  // search
+  const onSelect = (e) => {
+    setSearch(e.target.value);
+  };
 
-          <tbody>
-            {this.state.dataList.length ? (
-              this.state.dataList.map(({ id, name, status }) => {
-                return (
-                  <tr key={id}>
-                    <td>{id}</td>
-                    <td>
-                      {this.state.select?.id === id ? (
-                        <input
-                          onChange={onChange}
-                          name="name"
-                          type="text"
-                          value={this.state?.name}
-                        />
-                      ) : (
-                        name
-                      )}
-                    </td>
-                    <td>
-                      {this.state.select?.id === id ? (
-                        <input
-                          onChange={onChange}
-                          name="status"
-                          type="text"
-                          value={this.state?.status}
-                        />
-                      ) : (
-                        status
-                      )}
-                    </td>
-                    <td>
-                      <button onClick={() => onDelete(id)}>
-                        {this.state.delete}
-                      </button>
-                      <button
-                        onClick={() =>
-                          onUpdate({ id, name, status }, this.state.select?.id)
-                        }>
-                        {this.state.select?.id === id ? "save" : "edit"}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <th colSpan={4}>
-                  <h1>No Data</h1>
-                </th>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+  // search
+  const onSearch = (e) => {
+    let filtered = users.filter((value) =>
+      `${value[search]}`.toLowerCase().includes(e.target.value.toLowerCase())
     );
-  }
+    setData(filtered);
+  };
+
+  const onCreate = () => {
+    let user = {
+      id: users.length + 1,
+      name: name,
+      status: status,
+    };
+
+    setData([...users, user]);
+    setName("");
+    setStatus("");
+  };
+
+  // update
+  const onUpdate = ({ id, name, status }, isSave) => {
+    if(isSave){
+      let onUpdated = data.map((value)=> value.id === select?.id ?{...value, name: values.name, status: values.status} : value);
+      setData(onUpdated)
+      setSelect(null)
+    }else{
+      setValues({
+        name: name,
+        status: status
+      })
+      setSelect({ id, name, status });
+    }
+  };
+
+  return (
+    <div>
+      <select onChange={onSelect}>
+        <option value="id">id</option>
+        <option value="name">name</option>
+        <option value="status">status</option>
+      </select>
+      <input onChange={onSearch} type="text" placeholder="search..." />
+      <br />
+      <input
+        value={name}
+        name="newName"
+        type="text"
+        placeholder="addName"
+        onChange={(e) => setName(e.target.value)}
+      />
+      <input
+        value={status}
+        name="newStatus"
+        type="text"
+        placeholder="enter status"
+        onChange={(e) => setStatus(e.target.value)}
+      />
+      <button onClick={onCreate}>add user</button>
+      <table border="1">
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>name</th>
+            <th>status</th>
+            <th>actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {data.length ? (
+            data.map(({ id, name, status }) => {
+              return (
+                <tr key={id}>
+                  <td>{id}</td>
+                  <td>
+                    {select?.id === id ? (
+                      <input
+                        value={values.name}
+                        onChange={onChange}
+                        name="name"
+                        type="text"
+                      />
+                    ) : (
+                      name
+                    )}
+                  </td>
+                  <td>
+                    {select?.id === id ? (
+                      <input
+                        value={values.status}
+                        onChange={onChange}
+                        name="status"
+                        type="text"
+                      />
+                    ) : (
+                      status
+                    )}
+                  </td>
+                  <td>
+                    <button onClick={() => onDelete(id)}>delete</button>
+                    <button onClick={() => onUpdate({ id, name, status }, select?.id === id)}>
+                      {select?.id === id ? "save" : "edit "}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <th colSpan={4}>
+                <h1>No Data</h1>
+              </th>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
 }
+
+export default App;
